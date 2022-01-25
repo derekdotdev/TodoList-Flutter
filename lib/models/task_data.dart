@@ -9,8 +9,8 @@ class TaskData extends ChangeNotifier {
     Task(name: 'Clean studio'),
   ];
 
-  List<Task>? get tasks {
-    return _tasks.toList();
+  UnmodifiableListView<Task>? get tasks {
+    return UnmodifiableListView(_tasks);
   }
 
   int get taskCount {
