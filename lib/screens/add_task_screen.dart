@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_flutter/models/task_data.dart';
 
 class AddTaskScreen extends StatelessWidget {
   static const String id = '/add-task-screen';
   final Function addTaskCallback;
+  final String? userEmail;
 
-  AddTaskScreen(this.addTaskCallback, {Key? key}) : super(key: key);
+  AddTaskScreen(this.addTaskCallback, this.userEmail);
   String newTaskTitle = '';
 
   @override
@@ -56,7 +58,7 @@ class AddTaskScreen extends StatelessWidget {
                 ),
                 onPressed: () {
                   Provider.of<TaskData>(context, listen: false)
-                      .addTask(newTaskTitle);
+                      .addTask(newTaskTitle, userEmail!);
                   Navigator.pop(context);
                 },
               ),
