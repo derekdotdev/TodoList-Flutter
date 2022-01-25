@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_flutter/firebase_options.dart';
 import 'package:todo_flutter/models/task_data.dart';
 import 'package:todo_flutter/widgets/tasks_list.dart';
 import 'package:todo_flutter/screens/add_task_screen.dart';
