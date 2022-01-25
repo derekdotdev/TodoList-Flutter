@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 const String kHeroTag = 'logo';
 
+const double kIconSizeLarge = 65.0;
+
+const double kCircleAvatarSizeLarge = 40.0;
+
 const kTextFieldDecoration = InputDecoration(
   hintText: 'Enter a value',
   contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
