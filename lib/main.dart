@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_flutter/screens/tasks_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,4 +16,8 @@ class MyApp extends StatelessWidget {
       home: TasksScreen(),
     );
   }
+}
+
+class Data extends ChangeNotifier {
+  String data = 'Some data';
 }

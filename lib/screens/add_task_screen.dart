@@ -4,16 +4,16 @@ class AddTaskScreen extends StatelessWidget {
   final Function addTaskCallback;
 
   AddTaskScreen(this.addTaskCallback);
+  String newTaskTitle = '';
 
   @override
   Widget build(BuildContext context) {
-    String newTaskTitle = '';
     // String newText;
 
     return Container(
       color: const Color(0xFF757575),
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
@@ -36,14 +36,15 @@ class AddTaskScreen extends StatelessWidget {
                 textCapitalization: TextCapitalization.sentences,
                 textAlign: TextAlign.center,
                 onChanged: (newText) {
+                  print(newText);
                   newTaskTitle = newText;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               TextButton(
-                child: Text(
+                child: const Text(
                   'Add',
                   style: TextStyle(color: Colors.white),
                 ),
