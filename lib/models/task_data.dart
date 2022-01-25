@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
-import 'dart:collection';
 import 'task.dart';
+import 'dart:collection';
+import 'package:flutter/foundation.dart';
 
 class TaskData extends ChangeNotifier {
-  List<Task> _tasks = [
+  final List<Task> _tasks = [
     Task(name: 'Work out'),
     Task(name: 'Eat breakfast'),
     Task(name: 'Clean studio'),
@@ -25,6 +25,11 @@ class TaskData extends ChangeNotifier {
 
   void updateTask(Task task) {
     task.toggleDone();
+    notifyListeners();
+  }
+
+  void deleteTask(Task task) {
+    _tasks.remove(task);
     notifyListeners();
   }
 }

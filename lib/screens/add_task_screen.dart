@@ -5,20 +5,20 @@ import 'package:todo_flutter/models/task_data.dart';
 class AddTaskScreen extends StatelessWidget {
   final Function addTaskCallback;
 
-  AddTaskScreen(this.addTaskCallback);
+  AddTaskScreen(this.addTaskCallback, {Key? key}) : super(key: key);
   String newTaskTitle = '';
 
   @override
   Widget build(BuildContext context) {
-    // String newText;
-
     return Container(
       color: const Color(0xFF757575),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+            topLeft: Radius.circular(20.0),
+            topRight: Radius.circular(20.0),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.only(top: 40.0),
@@ -38,7 +38,6 @@ class AddTaskScreen extends StatelessWidget {
                 textCapitalization: TextCapitalization.sentences,
                 textAlign: TextAlign.center,
                 onChanged: (newText) {
-                  print(newText);
                   newTaskTitle = newText;
                 },
               ),

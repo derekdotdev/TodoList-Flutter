@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:todo_flutter/widgets/tasks_list.dart';
-import 'package:todo_flutter/screens/add_task_screen.dart';
-import 'package:todo_flutter/models/task.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_flutter/models/task_data.dart';
+import 'package:todo_flutter/widgets/tasks_list.dart';
+import 'package:todo_flutter/screens/add_task_screen.dart';
 
 class TasksScreen extends StatelessWidget {
+  const TasksScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,12 +22,11 @@ class TasksScreen extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: AddTaskScreen((newTaskTitle) {
-                  // setState(() {
-                  //   tasks.add(Task(name: newTaskTitle!));
-                  // });
-                  Navigator.pop(context);
-                }),
+                child: AddTaskScreen(
+                  (newTaskTitle) {
+                    Navigator.pop(context);
+                  },
+                ),
               ),
             ),
           );
