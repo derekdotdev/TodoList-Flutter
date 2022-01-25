@@ -11,12 +11,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() => runApp(const TodoList());
+void main() => runApp(TodoList());
 
 class TodoList extends StatelessWidget {
-  const TodoList({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
