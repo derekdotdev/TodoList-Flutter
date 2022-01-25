@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_flutter/firebase_options.dart';
 import 'package:todo_flutter/models/task_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todo_flutter/utilities/constants.dart';
 import 'package:todo_flutter/widgets/tasks_list.dart';
 import 'package:todo_flutter/screens/add_task_screen.dart';
 
@@ -45,6 +46,7 @@ class _TasksScreenState extends State<TasksScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lightBlueAccent,
         leading: null,
         actions: <Widget>[
           IconButton(
@@ -88,13 +90,17 @@ class _TasksScreenState extends State<TasksScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const CircleAvatar(
-                  child: Icon(
-                    Icons.list,
-                    size: 30.0,
+                const Hero(
+                  tag: kHeroTag,
+                  child: CircleAvatar(
+                    child: Icon(
+                      Icons.list,
+                      color: Colors.lightBlueAccent,
+                      size: 30.0,
+                    ),
+                    backgroundColor: Colors.white,
+                    radius: 30.0,
                   ),
-                  backgroundColor: Colors.white,
-                  radius: 30.0,
                 ),
                 const SizedBox(
                   height: 10.0,
