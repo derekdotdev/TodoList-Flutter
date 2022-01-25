@@ -38,6 +38,7 @@ dependencies:
   firebase_core: ^1.11.0
   firebase_auth: ^3.3.5
   cloud_firestore: ^3.1.6
+  modal_progress_hud_nsn: ^0.1.0-nullsafety-1
 
 #  firebase_auth_oauth: ^1.1.0
 #  firebase_auth_ui: ^1.0.1
