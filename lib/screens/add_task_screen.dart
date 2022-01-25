@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_flutter/models/task_data.dart';
 
 class AddTaskScreen extends StatelessWidget {
+  static const String id = '/add-task-screen';
   final Function addTaskCallback;
 
   AddTaskScreen(this.addTaskCallback, {Key? key}) : super(key: key);

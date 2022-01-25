@@ -6,6 +6,8 @@ import 'package:todo_flutter/widgets/tasks_list.dart';
 import 'package:todo_flutter/screens/add_task_screen.dart';
 
 class TasksScreen extends StatelessWidget {
+  static const String id = '/tasks-screen';
+
   const TasksScreen({Key? key}) : super(key: key);
 
   @override
