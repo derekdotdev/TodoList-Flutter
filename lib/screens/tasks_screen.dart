@@ -103,6 +103,21 @@ class _TasksScreenState extends State<TasksScreen> {
     await TaskData().getCloudTasks(userEmail);
   }
 
+  String numTasks() {
+    String resultText = '';
+    int result = 0;
+
+    result = Provider.of<TaskData>(context).taskCount;
+
+    if (result == 1) {
+      resultText = '$result Task';
+    } else {
+      resultText = '$result Tasks';
+    }
+
+    return resultText;
+  }
+
   @override
   Widget build(BuildContext context) {
     // final args = ModalRoute.of(context)!.settings.arguments as UserCredential;
@@ -176,9 +191,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   ),
                 ),
                 Text(
-                  TaskData.tasksFetched
-                      ? '${Provider.of<TaskData>(context).taskCount} Tasks'
-                      : '0 Tasks',
+                  TaskData.tasksFetched ? numTasks() : '0 Tasks',
                   style: const TextStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w600,
