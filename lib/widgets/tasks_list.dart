@@ -21,15 +21,10 @@ class TasksList extends StatelessWidget {
               taskTitle: task.name,
               isChecked: task.isDone,
               checkboxCallback: (bool? checkboxState) {
-                taskData.updateTask(task);
+                taskData.updateTaskDone(task);
               },
               longPressCallback: () {
-                taskData.deleteTask(task);
-                // _firestore.collection('tasks').add({
-                //   'sender': signedInUser.email,
-                //   'text': task.name,
-                //   'timestamp': FieldValue.serverTimestamp(),
-                // });
+                taskData.deleteCloudTask(task);
               },
             );
           },

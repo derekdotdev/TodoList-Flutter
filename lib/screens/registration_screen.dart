@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_flutter/screens/tasks_screen.dart';
 import 'package:todo_flutter/widgets/rounded_button.dart';
 import 'package:todo_flutter/utilities/constants.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+
+final _firestore = FirebaseFirestore.instance;
 
 class RegistrationScreen extends StatefulWidget {
   static const String id = '/registration-screen';
@@ -89,6 +92,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     final newUser = await _auth.createUserWithEmailAndPassword(
                         email: email, password: password);
                     if (newUser.additionalUserInfo?.isNewUser != null) {
+                      // Create a firestore collection with one default item
+                      _firestore
+                          .collection('users')
+                          .doc(email)
+                          .collection('tasks')
+                          .add({
+                        'sender': email,
+                        'text':
+                            'Default "task" added @ Registration to create tasks collection.',
+                        'isDone': false,
+                        'timestamp': FieldValue.serverTimestamp()
+                      });
                       Navigator.pushNamed(context, TasksScreen.id);
                     }
                     setState(() {

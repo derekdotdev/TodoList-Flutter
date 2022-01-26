@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_flutter/models/task.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:todo_flutter/firebase_options.dart';
 import 'package:todo_flutter/models/task_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_flutter/utilities/constants.dart';
 import 'package:todo_flutter/widgets/tasks_list.dart';
 import 'package:todo_flutter/screens/add_task_screen.dart';
 
+final _firestore = FirebaseFirestore.instance;
 late User signedInUser;
+late Stream<QuerySnapshot> _stream;
+bool streamInitialized = false;
 
 class TasksScreen extends StatefulWidget {
   static const String id = '/tasks-screen';
-
-  const TasksScreen({Key? key}) : super(key: key);
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -21,18 +22,26 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   final _auth = FirebaseAuth.instance;
-  late String taskText;
+  late User signedInUser;
   late String userEmail;
+  // late String taskText;
 
   @override
   void initState() {
+    initializeTodoList();
+    // initStream(userEmail);
     super.initState();
-    getCurrentUser();
   }
 
-  void getCurrentUser() async {
+  Future<void> initializeTodoList() async {
+    getCurrentUser();
+    await initializeStream(userEmail);
+    await fetchTasksFromCloud(userEmail);
+  }
+
+  Future<void> getCurrentUser() async {
     try {
-      final user = await _auth.currentUser;
+      final user = _auth.currentUser;
       if (user != null) {
         signedInUser = user;
         userEmail = signedInUser.email!;
@@ -42,8 +51,27 @@ class _TasksScreenState extends State<TasksScreen> {
     }
   }
 
+  Future<void> initializeStream(String userEmail) async {
+    try {
+      _stream = _firestore
+          .collection('users')
+          .doc(userEmail)
+          .collection('tasks')
+          .orderBy('timestamp')
+          .snapshots();
+      streamInitialized = true;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> fetchTasksFromCloud(String userEmail) async {
+    TaskData().getCloudTasks(userEmail);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // final args = ModalRoute.of(context)!.settings.arguments as UserCredential;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.lightBlueAccent,
@@ -114,7 +142,9 @@ class _TasksScreenState extends State<TasksScreen> {
                   ),
                 ),
                 Text(
-                  '${Provider.of<TaskData>(context).taskCount} Tasks',
+                  streamInitialized
+                      ? '${Provider.of<TaskData>(context).taskCount} Tasks'
+                      : '0 Tasks',
                   style: const TextStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w600,
@@ -124,6 +154,7 @@ class _TasksScreenState extends State<TasksScreen> {
               ],
             ),
           ),
+          // streamInitialized ? TasksStream(userEmail: userEmail) : Text('nada'),
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -143,3 +174,36 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 }
+//
+// class TasksStream extends StatelessWidget {
+//   final String userEmail;
+//
+//   const TasksStream({Key? key, required this.userEmail}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder<QuerySnapshot>(
+//         stream: _stream,
+//         builder: (context, snapshot) {
+//           final tasks = snapshot.data?.docs.reversed;
+//           // Provider.of<TaskData>(context).clearTasksList();
+//
+//           for (var task in tasks!) {
+//             final taskName = task.get('text');
+//             final taskSender = task.get('sender');
+//             final taskId = task.id;
+//             final isDone = task.get('isDone');
+//
+//             final Task newTask = Task(
+//                 name: taskName,
+//                 user: taskSender,
+//                 taskId: taskId,
+//                 isDone: isDone);
+//
+//             // Provider.of<TaskData>(context).populateTasksList(newTask);
+//           }
+//
+//           return
+//         });
+//   }
+// }
