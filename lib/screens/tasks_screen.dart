@@ -115,6 +115,12 @@ class _TasksScreenState extends State<TasksScreen> {
       resultText = '$result Tasks';
     }
 
+    setState(() {
+      result;
+      resultText;
+      TaskData().notifyTaskListeners();
+    });
+
     return resultText;
   }
 
@@ -213,7 +219,13 @@ class _TasksScreenState extends State<TasksScreen> {
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: TasksStream(userEmail: userEmail),
+              child: streamInitialized
+                  ? TasksStream(userEmail: userEmail)
+                  : const Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.lightBlueAccent,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -261,6 +273,7 @@ class TasksStream extends StatelessWidget {
             Provider.of<TaskData>(context).populateTasksList(newTask);
           }
 
+          // Provider.of<TaskData>(context).notifyTaskListeners();
           return TasksList();
         });
   }

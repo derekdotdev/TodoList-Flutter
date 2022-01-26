@@ -99,8 +99,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           .collection('tasks')
                           .add({
                         'sender': email,
-                        'text':
-                            'Default "task" added @ Registration to create tasks collection.',
+                        'text': 'Long-press to delete tasks when complete! =)',
                         'isDone': false,
                         'timestamp': FieldValue.serverTimestamp()
                       });

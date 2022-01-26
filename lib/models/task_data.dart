@@ -28,10 +28,13 @@ class TaskData extends ChangeNotifier {
     // notifyListeners();
   }
 
-  void addToTasksList(Task task) {
-    tasksListMain.add(task);
+  void notifyTaskListeners() {
     notifyListeners();
   }
+  // void addToTasksList(Task task) {
+  //   tasksListMain.add(task);
+  //   notifyListeners();
+  // }
 
   Future<void> getCloudTasks(String userEmail) async {
     List<Task> newTasksList = [];
@@ -78,7 +81,7 @@ class TaskData extends ChangeNotifier {
     final task =
         Task(name: newTaskTitle, user: userEmail, taskId: id, isDone: false);
     tasksListMain.add(task);
-    notifyListeners();
+    notifyTaskListeners();
   }
 
   void updateTaskDone(Task task) {
