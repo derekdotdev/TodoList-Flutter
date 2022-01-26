@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_flutter/models/task.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_flutter/models/task_data.dart';
+import 'package:todo_flutter/widgets/task_tile.dart';
+import 'package:todo_flutter/widgets/tasks_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_flutter/utilities/constants.dart';
-import 'package:todo_flutter/widgets/tasks_list.dart';
 import 'package:todo_flutter/screens/add_task_screen.dart';
 
 final _firestore = FirebaseFirestore.instance;
@@ -22,21 +24,21 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   final _auth = FirebaseAuth.instance;
+  var _isLoading = true;
   late User signedInUser;
   late String userEmail;
-  // late String taskText;
 
   @override
   void initState() {
     initializeTodoList();
-    // initStream(userEmail);
     super.initState();
   }
 
   Future<void> initializeTodoList() async {
-    getCurrentUser();
+    await getCurrentUser();
     await initializeStream(userEmail);
-    await fetchTasksFromCloud(userEmail);
+    await getCloudTasks(userEmail);
+    // setState(() {});
   }
 
   Future<void> getCurrentUser() async {
@@ -65,8 +67,40 @@ class _TasksScreenState extends State<TasksScreen> {
     }
   }
 
+  Future<void> getCloudTasks(String userEmail) async {
+    TaskData taskData = TaskData();
+    List<Task> newTasksList = [];
+
+    await _firestore
+        .collection('users')
+        .doc(userEmail)
+        .collection('tasks')
+        .get()
+        .then((querySnapshot) => {
+              querySnapshot.docs.forEach((doc) {
+                String sender = doc['sender'];
+                String text = doc['text'];
+                String id = doc.id;
+                bool isDone = doc['isDone'];
+                print('new Task: $sender, $text, $id, $isDone');
+                Task newTask =
+                    Task(user: sender, name: text, taskId: id, isDone: isDone);
+                newTasksList.add(newTask);
+              })
+            });
+    // for (Task task in newTasksList) {
+    //   TaskData().addToTasksList(task);
+    // }
+
+    setState(() {
+      taskData.tasksListMain = newTasksList;
+      TaskData.tasksFetched = true;
+      print('Task Data Fetched: ${TaskData.tasksFetched}');
+    });
+  }
+
   Future<void> fetchTasksFromCloud(String userEmail) async {
-    TaskData().getCloudTasks(userEmail);
+    await TaskData().getCloudTasks(userEmail);
   }
 
   @override
@@ -142,7 +176,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   ),
                 ),
                 Text(
-                  streamInitialized
+                  TaskData.tasksFetched
                       ? '${Provider.of<TaskData>(context).taskCount} Tasks'
                       : '0 Tasks',
                   style: const TextStyle(
@@ -166,7 +200,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: const TasksList(),
+              child: TasksStream(userEmail: userEmail),
             ),
           ),
         ],
@@ -174,36 +208,47 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 }
+
 //
-// class TasksStream extends StatelessWidget {
-//   final String userEmail;
-//
-//   const TasksStream({Key? key, required this.userEmail}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder<QuerySnapshot>(
-//         stream: _stream,
-//         builder: (context, snapshot) {
-//           final tasks = snapshot.data?.docs.reversed;
-//           // Provider.of<TaskData>(context).clearTasksList();
-//
-//           for (var task in tasks!) {
-//             final taskName = task.get('text');
-//             final taskSender = task.get('sender');
-//             final taskId = task.id;
-//             final isDone = task.get('isDone');
-//
-//             final Task newTask = Task(
-//                 name: taskName,
-//                 user: taskSender,
-//                 taskId: taskId,
-//                 isDone: isDone);
-//
-//             // Provider.of<TaskData>(context).populateTasksList(newTask);
-//           }
-//
-//           return
-//         });
-//   }
-// }
+class TasksStream extends StatelessWidget {
+  final String userEmail;
+
+  const TasksStream({Key? key, required this.userEmail}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: _stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          }
+
+          final tasks = snapshot.data?.docs.reversed;
+          Provider.of<TaskData>(context).clearTasksList();
+
+          List<TaskTile> taskTiles = [];
+
+          for (var task in tasks!) {
+            final taskName = task.get('text');
+            final taskSender = task.get('sender');
+            final taskId = task.id;
+            final isDone = task.get('isDone');
+
+            final Task newTask = Task(
+                name: taskName,
+                user: taskSender,
+                taskId: taskId,
+                isDone: isDone);
+
+            Provider.of<TaskData>(context).populateTasksList(newTask);
+          }
+
+          return TasksList();
+        });
+  }
+}

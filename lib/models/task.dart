@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Task {
-  final String name;
   final String user;
+  final String name;
   String taskId;
   bool isDone;
 
+  // Default constructor
   Task({
-    required this.name,
     required this.user,
+    required this.name,
     required this.taskId,
-    this.isDone = false,
+    required this.isDone,
   });
 
   void toggleDone() {

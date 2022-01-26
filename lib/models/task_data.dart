@@ -3,40 +3,61 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 import 'package:todo_flutter/widgets/tasks_list.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
 class TaskData extends ChangeNotifier {
-  final List<Task> _tasks = [];
+  static bool tasksFetched = false;
+  List<Task> tasksListMain = [];
 
   UnmodifiableListView<Task>? get tasks {
-    return UnmodifiableListView(_tasks);
+    return UnmodifiableListView(tasksListMain);
   }
 
   int get taskCount {
-    return _tasks.length;
+    return tasksListMain.length;
   }
 
   void clearTasksList() {
-    _tasks.clear();
+    tasksListMain.clear();
   }
 
   void populateTasksList(Task task) {
-    _tasks.add(task);
+    tasksListMain.add(task);
     // notifyListeners();
   }
 
-  void getCloudTasks(String userEmail) {
-    _firestore
+  void addToTasksList(Task task) {
+    tasksListMain.add(task);
+    notifyListeners();
+  }
+
+  Future<void> getCloudTasks(String userEmail) async {
+    List<Task> newTasksList = [];
+
+    await _firestore
         .collection('users')
         .doc(userEmail)
         .collection('tasks')
         .get()
-        .then((value) => value.docs.forEach((doc) {
-              print(doc['text']);
-            }));
+        .then((querySnapshot) => {
+              querySnapshot.docs.forEach((doc) {
+                String sender = doc['sender'];
+                String text = doc['text'];
+                String id = doc.id;
+                bool isDone = doc['isDone'];
+                print('$sender, $text, $id, $isDone');
+                Task newTask =
+                    Task(user: sender, name: text, taskId: id, isDone: isDone);
+                newTasksList.add(newTask);
+              })
+            });
+
+    print('Tasks fetched: $tasksFetched');
+    tasksListMain = newTasksList;
+    tasksFetched = true;
+    notifyListeners();
   }
 
   // DocumentReference<Map<String, dynamic>>
@@ -54,8 +75,9 @@ class TaskData extends ChangeNotifier {
 
     String id = ref.id;
 
-    final task = Task(name: newTaskTitle, user: userEmail, taskId: id);
-    _tasks.add(task);
+    final task =
+        Task(name: newTaskTitle, user: userEmail, taskId: id, isDone: false);
+    tasksListMain.add(task);
     notifyListeners();
   }
 
@@ -78,7 +100,7 @@ class TaskData extends ChangeNotifier {
         .collection('tasks')
         .doc(task.taskId)
         .delete();
-    _tasks.remove(task);
+    tasksListMain.remove(task);
     notifyListeners();
   }
 }

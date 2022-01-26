@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_flutter/models/task_data.dart';
 import 'package:todo_flutter/widgets/task_tile.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-final _firestore = FirebaseFirestore.instance;
+class TasksList extends StatefulWidget {
+  @override
+  State<TasksList> createState() => _TasksListState();
+}
 
-class TasksList extends StatelessWidget {
-  const TasksList({Key? key}) : super(key: key);
-
+class _TasksListState extends State<TasksList> {
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskData>(
