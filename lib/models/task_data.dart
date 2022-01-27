@@ -31,10 +31,6 @@ class TaskData extends ChangeNotifier {
   void notifyTaskListeners() {
     notifyListeners();
   }
-  // void addToTasksList(Task task) {
-  //   tasksListMain.add(task);
-  //   notifyListeners();
-  // }
 
   Future<void> getCloudTasks(String userEmail) async {
     List<Task> newTasksList = [];
@@ -57,10 +53,10 @@ class TaskData extends ChangeNotifier {
               })
             });
 
-    print('Tasks fetched: $tasksFetched');
     tasksListMain = newTasksList;
-    tasksFetched = true;
     notifyListeners();
+    tasksFetched = true;
+    // print('Tasks fetched: $tasksFetched');
   }
 
   // DocumentReference<Map<String, dynamic>>

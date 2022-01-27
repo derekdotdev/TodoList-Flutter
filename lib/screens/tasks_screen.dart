@@ -24,9 +24,9 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   final _auth = FirebaseAuth.instance;
-  var _isLoading = true;
   late User signedInUser;
   late String userEmail;
+  late int numberOfTasks = 0;
 
   @override
   void initState() {
@@ -38,7 +38,6 @@ class _TasksScreenState extends State<TasksScreen> {
     await getCurrentUser();
     await initializeStream(userEmail);
     await getCloudTasks(userEmail);
-    // setState(() {});
   }
 
   Future<void> getCurrentUser() async {
@@ -86,22 +85,21 @@ class _TasksScreenState extends State<TasksScreen> {
                 Task newTask =
                     Task(user: sender, name: text, taskId: id, isDone: isDone);
                 newTasksList.add(newTask);
+                numberOfTasks++;
               })
             });
-    // for (Task task in newTasksList) {
-    //   TaskData().addToTasksList(task);
-    // }
 
     setState(() {
       taskData.tasksListMain = newTasksList;
       TaskData.tasksFetched = true;
+      numberOfTasks;
       print('Task Data Fetched: ${TaskData.tasksFetched}');
     });
   }
 
-  Future<void> fetchTasksFromCloud(String userEmail) async {
-    await TaskData().getCloudTasks(userEmail);
-  }
+  // Future<void> fetchTasksFromCloud(String userEmail) async {
+  //   await TaskData().getCloudTasks(userEmail);
+  // }
 
   String numTasks() {
     String resultText = '';
@@ -196,14 +194,16 @@ class _TasksScreenState extends State<TasksScreen> {
                     color: Colors.white,
                   ),
                 ),
-                Text(
-                  TaskData.tasksFetched ? numTasks() : '0 Tasks',
-                  style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
+                streamInitialized
+                    ? TaskCount(numTasks())
+                    : Text(
+                        '$numberOfTasks Tasks',
+                        style: const TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
               ],
             ),
           ),
@@ -234,7 +234,23 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 }
 
-//
+class TaskCount extends StatelessWidget {
+  final String numTasks;
+  TaskCount(this.numTasks, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      numTasks,
+      style: const TextStyle(
+        fontSize: 24.0,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      ),
+    );
+  }
+}
+
 class TasksStream extends StatelessWidget {
   final String userEmail;
 
@@ -270,7 +286,8 @@ class TasksStream extends StatelessWidget {
                 taskId: taskId,
                 isDone: isDone);
 
-            Provider.of<TaskData>(context).populateTasksList(newTask);
+            Provider.of<TaskData>(context, listen: false)
+                .populateTasksList(newTask);
           }
 
           // Provider.of<TaskData>(context).notifyTaskListeners();
