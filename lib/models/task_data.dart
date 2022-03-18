@@ -32,32 +32,32 @@ class TaskData extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getCloudTasks(String userEmail) async {
-    List<Task> newTasksList = [];
-
-    await _firestore
-        .collection('users')
-        .doc(userEmail)
-        .collection('tasks')
-        .get()
-        .then((querySnapshot) => {
-              querySnapshot.docs.forEach((doc) {
-                String sender = doc['sender'];
-                String text = doc['text'];
-                String id = doc.id;
-                bool isDone = doc['isDone'];
-                print('$sender, $text, $id, $isDone');
-                Task newTask =
-                    Task(user: sender, name: text, taskId: id, isDone: isDone);
-                newTasksList.add(newTask);
-              })
-            });
-
-    tasksListMain = newTasksList;
-    notifyListeners();
-    tasksFetched = true;
-    // print('Tasks fetched: $tasksFetched');
-  }
+  // Future<void> getCloudTasks(String userEmail) async {
+  //   List<Task> newTasksList = [];
+  //
+  //   await _firestore
+  //       .collection('users')
+  //       .doc(userEmail)
+  //       .collection('tasks')
+  //       .get()
+  //       .then((querySnapshot) => {
+  //             querySnapshot.docs.forEach((doc) {
+  //               String sender = doc['sender'];
+  //               String text = doc['text'];
+  //               String id = doc.id;
+  //               bool isDone = doc['isDone'];
+  //               print('$sender, $text, $id, $isDone');
+  //               Task newTask =
+  //                   Task(user: sender, name: text, taskId: id, isDone: isDone);
+  //               newTasksList.add(newTask);
+  //             })
+  //           });
+  //
+  //   tasksListMain = newTasksList;
+  //   notifyListeners();
+  //   tasksFetched = true;
+  //   // print('Tasks fetched: $tasksFetched');
+  // }
 
   // DocumentReference<Map<String, dynamic>>
   void addCloudTask(String newTaskTitle, String userEmail) async {

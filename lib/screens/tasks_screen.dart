@@ -12,6 +12,7 @@ import 'package:todo_flutter/screens/add_task_screen.dart';
 
 final _firestore = FirebaseFirestore.instance;
 late User signedInUser;
+bool _loading = true;
 late Stream<QuerySnapshot> _stream;
 bool streamInitialized = false;
 
@@ -27,6 +28,7 @@ class _TasksScreenState extends State<TasksScreen> {
   late User signedInUser;
   late String userEmail;
   late int numberOfTasks = 0;
+  final TaskData taskData = TaskData();
 
   @override
   void initState() {
@@ -88,43 +90,38 @@ class _TasksScreenState extends State<TasksScreen> {
                 numberOfTasks++;
               })
             });
-
     setState(() {
       taskData.tasksListMain = newTasksList;
       TaskData.tasksFetched = true;
       numberOfTasks;
       print('Task Data Fetched: ${TaskData.tasksFetched}');
     });
+    _loading = false;
   }
-
-  // Future<void> fetchTasksFromCloud(String userEmail) async {
-  //   await TaskData().getCloudTasks(userEmail);
-  // }
 
   String numTasks() {
     String resultText = '';
     int result = 0;
 
-    result = Provider.of<TaskData>(context).taskCount;
-
-    if (result == 1) {
-      resultText = '$result Task';
-    } else {
-      resultText = '$result Tasks';
-    }
-
     setState(() {
+      result = Provider.of<TaskData>(context).taskCount;
+
+      if (result == 1) {
+        resultText = '$result Task';
+      } else {
+        resultText = '$result Tasks';
+      }
+
       result;
       resultText;
-      TaskData().notifyTaskListeners();
     });
+    taskData.notifyTaskListeners();
 
     return resultText;
   }
 
   @override
   Widget build(BuildContext context) {
-    // final args = ModalRoute.of(context)!.settings.arguments as UserCredential;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.lightBlueAccent,
@@ -133,7 +130,6 @@ class _TasksScreenState extends State<TasksScreen> {
           IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                // Implement logout functionality
                 _auth.signOut();
                 Navigator.pop(context);
               }),
@@ -162,74 +158,80 @@ class _TasksScreenState extends State<TasksScreen> {
           );
         },
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.only(
-                top: 60.0, left: 30.0, right: 30.0, bottom: 30.0),
-            child: Column(
+      body: !_loading
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Hero(
-                  tag: kHeroTag,
-                  child: CircleAvatar(
-                    child: Icon(
-                      Icons.list,
-                      color: Colors.lightBlueAccent,
-                      size: 30.0,
-                    ),
-                    backgroundColor: Colors.white,
-                    radius: 30.0,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                const Text(
-                  'Todo List',
-                  style: TextStyle(
-                    fontSize: 50.0,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                streamInitialized
-                    ? TaskCount(numTasks())
-                    : Text(
-                        '$numberOfTasks Tasks',
-                        style: const TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w600,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(
+                      top: 60.0, left: 30.0, right: 30.0, bottom: 30.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Hero(
+                        tag: kHeroTag,
+                        child: CircleAvatar(
+                          child: Icon(
+                            Icons.list,
+                            color: Colors.lightBlueAccent,
+                            size: 30.0,
+                          ),
+                          backgroundColor: Colors.white,
+                          radius: 30.0,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      const Text(
+                        'Todo List',
+                        style: TextStyle(
+                          fontSize: 50.0,
+                          fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
-              ],
-            ),
-          ),
-          // streamInitialized ? TasksStream(userEmail: userEmail) : Text('nada'),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              height: 300.0,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
+                      streamInitialized
+                          ? TaskCount(numTasks())
+                          : Text(
+                              '$numberOfTasks Tasks',
+                              style: const TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ],
+                  ),
                 ),
-              ),
-              child: streamInitialized
-                  ? TasksStream(userEmail: userEmail)
-                  : const Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.lightBlueAccent,
+                // streamInitialized ? TasksStream(userEmail: userEmail) : Text('nada'),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    height: 300.0,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
                       ),
                     ),
+                    child: streamInitialized
+                        ? TasksStream(userEmail: userEmail)
+                        : const Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: Colors.lightBlueAccent,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            )
+          : const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 }
