@@ -20,6 +20,16 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = '';
   String password = '';
 
+  String getErrorMessage(String error) {
+    if (error.contains('user-not-found')) {
+      return 'Invalid email address';
+    } else if (error.contains('wrong-password')) {
+      return 'Invalid password';
+    } else {
+      return 'Invalid email or password';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,11 +102,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (newUser.additionalUserInfo?.isNewUser != null) {
                         Navigator.pushNamed(context, TasksScreen.id);
                       }
+                    } catch (e) {
+                      print(e);
+                      var message = getErrorMessage(e.toString());
+                      await _showAlertDialog(context, message);
+                    } finally {
                       setState(() {
                         showModalProgressSpinner = false;
                       });
-                    } catch (e) {
-                      print(e);
                     }
                   }),
             ],
@@ -105,4 +118,39 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
+
+_showAlertDialog(BuildContext context, String errorMessage) {
+  // set up the button
+  Widget okButton = TextButton(
+    child: const Text('OK'),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  );
+
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: const Text(
+      'Error',
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    content: Text(
+      errorMessage,
+      style: const TextStyle(fontSize: 14),
+    ),
+    actions: [
+      okButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      });
 }

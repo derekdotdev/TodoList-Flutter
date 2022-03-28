@@ -27,7 +27,8 @@ class _TasksScreenState extends State<TasksScreen> {
   final _auth = FirebaseAuth.instance;
   late User signedInUser;
   late String userEmail;
-  late int numberOfTasks = 0;
+  // late int numberOfTasks = 0;
+  var _numberOfTasks = 0;
   final TaskData taskData = TaskData();
 
   @override
@@ -87,13 +88,14 @@ class _TasksScreenState extends State<TasksScreen> {
                 Task newTask =
                     Task(user: sender, name: text, taskId: id, isDone: isDone);
                 newTasksList.add(newTask);
-                numberOfTasks++;
+                // _numberOfTasks++;
               })
             });
     setState(() {
       taskData.tasksListMain = newTasksList;
       TaskData.tasksFetched = true;
-      numberOfTasks;
+
+      _numberOfTasks = newTasksList.length;
       print('Task Data Fetched: ${TaskData.tasksFetched}');
     });
     _loading = false;
@@ -194,7 +196,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       streamInitialized
                           ? TaskCount(numTasks())
                           : Text(
-                              '$numberOfTasks Tasks',
+                              '$_numberOfTasks Tasks',
                               style: const TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.w600,
@@ -238,7 +240,7 @@ class _TasksScreenState extends State<TasksScreen> {
 
 class TaskCount extends StatelessWidget {
   final String numTasks;
-  TaskCount(this.numTasks, {Key? key}) : super(key: key);
+  const TaskCount(this.numTasks, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
